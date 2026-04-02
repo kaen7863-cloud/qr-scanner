@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STROM QR SCANNER</title>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 20px; background: #f4f4f9; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
+        #reader { width: 100%; border-radius: 10px; overflow: hidden; }
+        #status { margin-top: 15px; font-weight: bold; color: #2c3e50; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>QR SCAN TO SHEET</h2>
+        <div id="reader"></div>
+        <div id="status">กรุณาอนุญาตให้ใช้กล้อง</div>
+    </div>
+
+    <script>
+        // *** วาง URL จาก Google Apps Script ของคุณตรงนี้ ***
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzDHLX41L_3kdGMuWLeNNJNbzrzQeoyQmCbn23x0LU1h_5yrAJ7BjLVuepL2_iXRIge/exec"; 
+
+        function onScanSuccess(decodedText) {
+            document.getElementById('status').innerText = "กำลังบันทึก: " + decodedText;
+            
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify({ qrData: decodedText })
+            })
+            .then(() => {
+                document.getElementById('status').innerText = "✅ บันทึกสำเร็จ!";
+                setTimeout(() => { location.reload(); }, 2000);
+            })
+            .catch(err => { alert("เกิดข้อผิดพลาด: " + err); });
+        }
+
+        let html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
+        html5QrcodeScanner.render(onScanSuccess);
+    </script>
+</body>
+</html>

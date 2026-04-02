@@ -18,30 +18,8 @@
         <div id="reader"></div>
         <div id="status">กรุณาอนุญาตให้ใช้กล้อง</div>
     </div>
-
     <script>
-        // *** วาง URL จาก Google Apps Script ของคุณตรงนี้ ***
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzDHLX41L_3kdGMuWLeNNJNbzrzQeoyQmCbn23x0LU1h_5yrAJ7BjLVuepL2_iXRIge/exec"; 
-
-        function onScanSuccess(decodedText) {
-            document.getElementById('status').innerText = "กำลังบันทึก: " + decodedText;
-            
-            fetch(SCRIPT_URL, {
-                method: "POST",
-                body: JSON.stringify({ qrData: decodedText })
-            })
-            .then(() => {
-                document.getElementById('status').innerText = "✅ บันทึกสำเร็จ!";
-                setTimeout(() => { location.reload(); }, 2000);
-            })
-            .catch(err => { alert("เกิดข้อผิดพลาด: " + err); });
-        }
-
-        let html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 5, qrbox: 250 });
-        html5QrcodeScanner.render(onScanSuccess);
-    </script>
-    <script>
-    const SCRIPT_URL = "URL_ของ_คุณ"; 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzDHLX41L_3kdGMuWLeNNJNbzrzQeoyQmCbn23x0LU1h_5yrAJ7BjLVuepL2_iXRIge/exec"; 
     
     // [เพิ่มตรงนี้] ตัวแปรสำหรับเช็คสถานะ (false = ว่าง, true = กำลังทำงาน)
     let isProcessing = false; 

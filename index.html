@@ -40,5 +40,46 @@
         let html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 5, qrbox: 250 });
         html5QrcodeScanner.render(onScanSuccess);
     </script>
+    <script>
+    const SCRIPT_URL = "URL_ของ_คุณ"; 
+    
+    // [เพิ่มตรงนี้] ตัวแปรสำหรับเช็คสถานะ (false = ว่าง, true = กำลังทำงาน)
+    let isProcessing = false; 
+
+    function onScanSuccess(decodedText) {
+        // [เช็คตรงนี้] ถ้าเครื่องกำลังประมวลผลอยู่ ให้จบการทำงานทันที (ไม่สแกนซ้ำ)
+        if (isProcessing) {
+            return; 
+        }
+
+        // [เปลี่ยนสถานะ] เมื่อสแกนติดครั้งแรก ให้เปลี่ยนเป็น true ทันทีเพื่อล็อคระบบ
+        isProcessing = true; 
+        
+        document.getElementById('status').innerText = "กำลังบันทึก: " + decodedText;
+
+        // ส่งข้อมูลไป Google Sheets
+        fetch(SCRIPT_URL, {
+            method: "POST",
+            body: JSON.stringify({ qrData: decodedText })
+        })
+        .then(res => {
+            document.getElementById('status').innerText = "✅ บันทึกสำเร็จ!";
+            // รอ 3 วินาทีเพื่อให้คนสแกนรู้ว่าติดแล้ว ก่อนจะรีโหลดเพื่อเริ่มใหม่
+            setTimeout(() => { 
+                location.reload(); 
+            }, 3000); 
+        })
+        .catch(err => {
+            alert("เกิดข้อผิดพลาด: " + err);
+            // ถ้าพัง ให้ปลดล็อคเพื่อให้สแกนใหม่ได้
+            isProcessing = false; 
+            document.getElementById('status').innerText = "เกิดข้อผิดพลาด ลองใหม่อีกครั้ง";
+        });
+    }
+
+    // ส่วนการตั้งค่า Scanner เดิมของคุณ
+    let html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
+    html5QrcodeScanner.render(onScanSuccess);
+</script>
 </body>
 </html>
